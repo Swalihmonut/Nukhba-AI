@@ -17,10 +17,10 @@ import {
 
 interface VoiceInteractionProps {
   onRecordingComplete?: (audioBlob: Blob) => void;
-  onLanguageChange?: (language: string) => void;
+  onLanguageChange?: (language: "english" | "arabic" | "hindi") => void;
   isListening?: boolean;
   aiResponseAudio?: string;
-  language?: string;
+  language?: "english" | "arabic" | "hindi";
 }
 
 const VoiceInteraction = ({
@@ -30,6 +30,31 @@ const VoiceInteraction = ({
   aiResponseAudio = "",
   language = "english",
 }: VoiceInteractionProps) => {
+  const isRTL = language === "arabic";
+
+  const getLocalizedText = (key: string) => {
+    const texts = {
+      english: {
+        recording: "Recording...",
+        tapToSpeak: "Tap to speak",
+        autoPlay: "Auto-play responses",
+        language: "Language",
+      },
+      arabic: {
+        recording: "جاري التسجيل...",
+        tapToSpeak: "اضغط للتحدث",
+        autoPlay: "تشغيل تلقائي للردود",
+        language: "اللغة",
+      },
+      hindi: {
+        recording: "रिकॉर्डिंग...",
+        tapToSpeak: "बोलने के लिए टैप करें",
+        autoPlay: "स्वचालित उत्तर प्लेबैक",
+        language: "भाषा",
+      },
+    };
+    return texts[language]?.[key] || texts.english[key];
+  };
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState([70]);
@@ -85,16 +110,35 @@ const VoiceInteraction = ({
     }
   }, [aiResponseAudio, autoPlay]);
 
-  const handleRecordToggle = () => {
+  const handleRecordToggle = async () => {
     if (isRecording) {
-      // Simulate recording completion
-      setTimeout(() => {
+      // Stop recording
+      setIsRecording(false);
+
+      try {
+        // Simulate processing with potential failure
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            // 5% chance of processing failure
+            if (Math.random() < 0.05) {
+              reject(new Error("Audio processing failed"));
+            } else {
+              resolve(null);
+            }
+          }, 1000);
+        });
+
         // Create a mock audio blob
         const mockBlob = new Blob(["audio data"], { type: "audio/wav" });
         onRecordingComplete(mockBlob);
-      }, 500);
+      } catch (error) {
+        console.error("Voice recording error:", error);
+        // Could show error toast here
+      }
+    } else {
+      // Start recording
+      setIsRecording(true);
     }
-    setIsRecording(!isRecording);
   };
 
   const handlePlayToggle = () => {
@@ -115,18 +159,24 @@ const VoiceInteraction = ({
   };
 
   return (
-    <Card className="w-full p-4 bg-background border rounded-xl shadow-sm">
+    <Card
+      className={`w-full p-4 bg-background border rounded-xl shadow-sm ${isRTL ? "rtl" : "ltr"}`}
+    >
       <div className="flex flex-col space-y-4">
         {/* Voice Visualizer */}
-        <div className="flex items-center justify-center h-16 bg-muted/30 rounded-lg overflow-hidden">
+        <div className="flex items-center justify-center h-16 bg-gradient-to-r from-muted/20 to-muted/40 rounded-lg overflow-hidden">
           <div className="flex items-end h-full space-x-1 px-2">
             {visualizerData.map((height, index) => (
               <div
                 key={index}
-                className={`w-1.5 rounded-t-sm ${isRecording ? "bg-primary" : "bg-muted"}`}
+                className={`w-1.5 rounded-t-sm transition-all duration-200 ${
+                  isRecording
+                    ? "bg-gradient-to-t from-primary to-primary/60 voice-bar"
+                    : "bg-muted"
+                }`}
                 style={{
                   height: `${height}%`,
-                  transition: "height 0.1s ease-in-out",
+                  animationDelay: `${index * 0.1}s`,
                 }}
               />
             ))}
@@ -149,7 +199,9 @@ const VoiceInteraction = ({
               )}
             </Button>
             <div className="text-sm font-medium">
-              {isRecording ? "Recording..." : "Tap to speak"}
+              {isRecording
+                ? getLocalizedText("recording")
+                : getLocalizedText("tapToSpeak")}
             </div>
           </div>
 
@@ -206,7 +258,7 @@ const VoiceInteraction = ({
               onCheckedChange={setAutoPlay}
             />
             <Label htmlFor="auto-play" className="text-sm">
-              Auto-play responses
+              {getLocalizedText("autoPlay")}
             </Label>
           </div>
         </div>
