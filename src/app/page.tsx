@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
 import StudyDashboard from "@/components/StudyDashboard";
 import QuickAccessMenu from "@/components/QuickAccessMenu";
 import AITutor from "@/components/AITutor";
+import { AIProvider } from "@/components/AITutor";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -37,9 +38,6 @@ class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-
-// Assume AIProvider exists for AITutor (from previous context)
-import { AIProvider } from "@/components/AITutor";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
@@ -192,7 +190,6 @@ export default function Home() {
 
   // Mock rate limiting check (in a real app, this would be an API call)
   useEffect(() => {
-    // Simulate checking AI query limit for free tier
     const checkQueryLimit = () => {
       const queryCount = parseInt(
         localStorage.getItem("ai-query-count") || "0",
@@ -209,7 +206,7 @@ export default function Home() {
     <AIProvider>
       <main
         className={`flex min-h-screen flex-col items-center justify-between p-4 md:p-8 bg-background transition-all duration-300`}
-        dir={isRTL ? "rtl" : "ltr"} // Use dir attribute for proper RTL support
+        dir={isRTL ? "rtl" : "ltr"}
       >
         {/* Celebration overlay */}
         {showCelebration && (
@@ -220,97 +217,13 @@ export default function Home() {
             aria-label={getLocalizedText("goalCompleted")}
           >
             <div className="text-6xl animate-bounce">🎉</div>
-            <div className="absolute top-1/4 left-1/4 text-4xl confetti">
-              ⭐
-            </div>
-            <div
-              className="absolute top-1/3 right-1/4 text-4xl confetti"
-              style={{ animationDelay: "0.5s" }}
-            >
-              🏆
-            </div>
-            <div
-              className="absolute bottom-1/3 left-1/3 text-4xl confetti"
-              style={{ animationDelay: "1s" }}
-            >
-              ✨
-            </div>
           </div>
         )}
 
         <div className="w-full max-w-7xl mx-auto">
-          {/* Header with app name and controls */}
-          <div className="flex justify-between items-center mb-6 slide-up">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <div className="p-2 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                    {getLocalizedText("appName")}
-                  </h1>
-                  <p className="text-sm text-muted-foreground hidden md:block">
-                    {getLocalizedText("tagline")}
-                  </p>
-                </div>
-              </div>
-              {studyStreak > 0 && (
-                <Badge
-                  variant="outline"
-                  className="hidden md:flex items-center gap-1 bg-gradient-to-r from-orange-100 to-yellow-100 dark:from-orange-900/30 dark:to-yellow-900/30"
-                >
-                  <Trophy className="h-3 w-3" />
-                  <span>{studyStreak} day streak!</span>
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={cycleLanguage}
-                aria-label={getLocalizedText("switchLanguage")}
-                className="hover:scale-105 transition-transform"
-              >
-                <Globe className="h-4 w-4" />
-                <span className="sr-only">
-                  {getLocalizedText("switchLanguage")}
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label={getLocalizedText("toggleTheme")}
-                className="hover:scale-105 transition-transform"
-              >
-                {theme === "dark" ? (
-                  <SunIcon className="h-4 w-4" />
-                ) : (
-                  <MoonIcon className="h-4 w-4" />
-                )}
-                <span className="sr-only">
-                  {theme === "dark"
-                    ? getLocalizedText("lightMode")
-                    : getLocalizedText("darkMode")}
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={toggleNotifications}
-                aria-label={getLocalizedText("toggleNotifications")}
-                className="hover:scale-105 transition-transform"
-              >
-                <Bell className="h-4 w-4" />
-                <span className="sr-only">
-                  {notificationsEnabled
-                    ? getLocalizedText("notificationsOff")
-                    : getLocalizedText("notificationsOn")}
-                </span>
-              </Button>
-            </div>
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h1>{getLocalizedText("appName")}</h1>
           </div>
 
           {/* Main content tabs */}
