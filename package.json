@@ -54,5 +54,6 @@
     "tailwindcss": "^3",
     "tailwindcss-animate": "^1",
     "typescript": "^5"
-  }
+  },
+  "version": "0.0.1"
 }
