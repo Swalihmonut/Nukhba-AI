@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -39,7 +39,7 @@ interface AITutorProps {
   onLanguageChange?: (language: "english" | "arabic" | "hindi") => void;
 }
 
-// Move this function definition to the top before its first usage
+// Helper function to get the welcome message
 function getWelcomeMessage(lang: "english" | "arabic" | "hindi") {
   const messages = {
     english:
@@ -65,7 +65,7 @@ const AITutor = ({
     initialInteractionMode,
   );
   const [inputText, setInputText] = useState("");
-  const [chatMessages, setChatMessages] = useState<Message[]>(
+  const [chatMessages, setChatMessages] = useState<Message[]>(() =>
     messages.length > 0
       ? messages
       : [
@@ -79,13 +79,13 @@ const AITutor = ({
         ],
   );
   const [isProcessing, setIsProcessing] = useState(false);
-  const [queryCount, setQueryCount] = useState(0);
-  const [dailyLimit] = useState(10);
-  const [isPremium] = useState(false);
   const isRTL = currentLanguage === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         aiTutor: "AI Tutor",
         text: "Text",
@@ -97,11 +97,6 @@ const AITutor = ({
           "I understand your question. Here's what you need to know about this topic for your exam preparation...",
         voiceResponse:
           "I heard your question. Here's my response to help with your exam preparation...",
-        dailyLimit: "Daily limit reached",
-        upgradePrompt: "Upgrade to Premium for unlimited queries",
-        queriesLeft: "queries left today",
-        rateLimited:
-          "You've reached your daily limit. Please upgrade to Premium or try again tomorrow.",
       },
       arabic: {
         aiTutor: "المدرس الذكي",
@@ -113,11 +108,6 @@ const AITutor = ({
         aiResponse:
           "أفهم سؤالك. إليك ما تحتاج إلى معرفته حول هذا الموضوع للتحضير للامتحان...",
         voiceResponse: "سمعت سؤالك. إليك ردي للمساعدة في التحضير للامتحان...",
-        dailyLimit: "تم الوصول للحد اليومي",
-        upgradePrompt: "ترقية إلى بريميوم للاستعلامات غير المحدودة",
-        queriesLeft: "استعلامات متبقية اليوم",
-        rateLimited:
-          "لقد وصلت إلى حدك اليومي. يرجى الترقية إلى بريميوم أو المحاولة مرة أخرى غداً.",
       },
       hindi: {
         aiTutor: "AI शिक्षक",
@@ -130,11 +120,6 @@ const AITutor = ({
           "मैं आपका प्रश्न समझता हूं। यहाँ है जो आपको इस विषय के बारे में जानना चाहिए परीक्षा की तैयारी के लिए...",
         voiceResponse:
           "मैंने आपका प्रश्न सुना। यहाँ है मेरा उत्तर परीक्षा की तैयारी में मदद के लिए...",
-        dailyLimit: "दैनिक सीमा पहुंच गई",
-        upgradePrompt: "असीमित प्रश्नों के लिए प्रीमियम में अपग्रेड करें",
-        queriesLeft: "आज बचे प्रश्न",
-        rateLimited:
-          "आपने अपनी दैनिक सीमा पूरी कर ली है। कृपया प्रीमियम में अपग्रेड करें या कल फिर कोशिश करें।",
       },
     };
     return texts[currentLanguage]?.[key] || texts.english[key];
@@ -156,7 +141,7 @@ const AITutor = ({
       language: currentLanguage,
     };
 
-    setChatMessages([...chatMessages, userMessage]);
+    setChatMessages((prev) => [...prev, userMessage]);
     setInputText("");
     setIsProcessing(true);
 
@@ -185,7 +170,7 @@ const AITutor = ({
       language: currentLanguage,
     };
 
-    setChatMessages([...chatMessages, userMessage]);
+    setChatMessages((prev) => [...prev, userMessage]);
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -221,17 +206,17 @@ const AITutor = ({
     ]);
   };
 
-  React.useEffect(() => {
-    if (chatMessages.length === 1 && chatMessages[0].sender === "ai") {
-      setChatMessages([
-        {
-          ...chatMessages[0],
-          content: getWelcomeMessage(currentLanguage),
-          language: currentLanguage,
-        },
-      ]);
-    }
-  }, [currentLanguage, chatMessages]);
+  useEffect(() => {
+    setChatMessages([
+      {
+        id: "1",
+        content: getWelcomeMessage(currentLanguage),
+        sender: "ai",
+        timestamp: new Date(),
+        language: currentLanguage,
+      },
+    ]);
+  }, [currentLanguage]);
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-background border shadow-lg">
@@ -284,7 +269,9 @@ const AITutor = ({
             {chatMessages.map((message) => (
               <div
                 key={message.id}
-                className={`flex mb-4 ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex mb-4 ${
+                  message.sender === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 <div className="flex items-start max-w-[80%]">
                   {message.sender === "ai" && (
