@@ -275,3 +275,21 @@ const VoiceInteraction = ({
 };
 
 export default VoiceInteraction;
+
+async function onRecordingComplete(recording: Blob) {
+  try {
+    const response = await uploadRecording(recording);
+    console.log("Recording uploaded successfully:", response);
+  } catch (error) {
+    console.error("Failed to upload recording:", error);
+  }
+}
+
+// Example data fetching and processing
+fetchData()
+  .then((data) => {
+    processData(data);
+  })
+  .catch((error) => {
+    console.error("Failed to fetch data:", error);
+  });

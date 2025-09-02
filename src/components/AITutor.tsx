@@ -39,8 +39,8 @@ interface AITutorProps {
   onLanguageChange?: (language: "english" | "arabic" | "hindi") => void;
 }
 
-// 💡 FIXED: Moved function before its first use
-const getWelcomeMessage = (lang: "english" | "arabic" | "hindi") => {
+// Move this function definition to the top before its first usage
+function getWelcomeMessage(lang: "english" | "arabic" | "hindi") {
   const messages = {
     english:
       "Hello! I'm your AI tutor. How can I help you with your exam preparation today?",
@@ -50,7 +50,7 @@ const getWelcomeMessage = (lang: "english" | "arabic" | "hindi") => {
       "नमस्ते! मैं आपका AI शिक्षक हूं। आज मैं आपकी परीक्षा की तैयारी में कैसे मदद कर सकता हूं?",
   };
   return messages[lang] || messages.english;
-};
+}
 
 const AITutor = ({
   language = "english",

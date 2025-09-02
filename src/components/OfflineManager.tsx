@@ -18,6 +18,9 @@ interface OfflineManagerProps {
   onSyncComplete?: () => void;
 }
 
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000; // 2 seconds
+
 const OfflineManager = ({
   language = "english",
   onSyncComplete = () => {},
@@ -26,6 +29,7 @@ const OfflineManager = ({
   const [isSyncing, setIsSyncing] = useState(false);
   const [pendingSync, setPendingSync] = useState(0);
   const [offlineData, setOfflineData] = useState<OfflineData | null>(null);
+  const [syncStatus, setSyncStatus] = useState("idle");
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
@@ -122,6 +126,7 @@ const OfflineManager = ({
     if (!isOnline || isSyncing) return;
 
     setIsSyncing(true);
+    setSyncStatus("syncing");
     try {
       let retries = 3;
       let syncSuccess = false;
@@ -193,12 +198,15 @@ const OfflineManager = ({
           localStorage.removeItem("nukhba-pending-sync");
 
           syncSuccess = true;
+          setSyncStatus("success");
           onSyncComplete();
         } catch (error) {
           retries--;
           console.error(`Sync attempt failed (${3 - retries}/3):`, error);
 
           if (retries === 0) {
+            setSyncStatus("failed");
+            console.error("All sync attempts failed.");
             throw error;
           } else {
             await new Promise((resolve) => setTimeout(resolve, 2000));
