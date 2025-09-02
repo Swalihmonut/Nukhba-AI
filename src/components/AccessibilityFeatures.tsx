@@ -53,7 +53,10 @@ const AccessibilityFeatures = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         accessibility: "Accessibility",
         highContrast: "High Contrast",
@@ -194,7 +197,7 @@ const AccessibilityFeatures = ({
     value: AccessibilitySettings[K],
   ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
-    announceToScreenReader(`${key} ${value ? "enabled" : "disabled"}`);
+    announceToScreenReader(`${String(key)} ${value ? "enabled" : "disabled"}`);
   };
 
   const testAccessibility = () => {
@@ -260,7 +263,9 @@ const AccessibilityFeatures = ({
       {/* Accessibility Panel */}
       {isVisible && (
         <Card
-          className={`fixed top-4 right-4 z-40 w-80 max-h-[80vh] overflow-y-auto ${isRTL ? "rtl" : "ltr"}`}
+          className={`fixed top-4 right-4 z-40 w-80 max-h-[80vh] overflow-y-auto ${
+            isRTL ? "rtl" : "ltr"
+          }`}
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -292,7 +297,10 @@ const AccessibilityFeatures = ({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="large-text" className="flex items-center gap-2">
+                <Label
+                  htmlFor="large-text"
+                  className="flex items-center gap-2"
+                >
                   <Type className="h-4 w-4" />
                   {getLocalizedText("largeText")}
                 </Label>
@@ -311,7 +319,9 @@ const AccessibilityFeatures = ({
                 </Label>
                 <Slider
                   value={[settings.fontSize]}
-                  onValueChange={([value]) => updateSetting("fontSize", value)}
+                  onValueChange={([value]) =>
+                    updateSetting("fontSize", value)
+                  }
                   min={12}
                   max={24}
                   step={1}
