@@ -330,6 +330,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                 <CardContent>
                   <Calendar
                     mode="single"
+                    required
                     selected={date}
                     onSelect={setDate}
                     className="rounded-md border"
@@ -362,8 +363,8 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                           language === "arabic"
                             ? "ar-SA"
                             : language === "hindi"
-                            ? "hi-IN"
-                            : "en-US",
+                              ? "hi-IN"
+                              : "en-US",
                         )}
                       </p>
                     </div>
