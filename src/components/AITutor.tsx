@@ -29,7 +29,7 @@ interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
-  language: "english" | "arabic";
+  language: "english" | "arabic" | "hindi";
 }
 
 interface AITutorProps {
@@ -231,7 +231,7 @@ const AITutor = ({
         },
       ]);
     }
-  }, [currentLanguage]);
+  }, [currentLanguage, chatMessages]);
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-background border shadow-lg">
