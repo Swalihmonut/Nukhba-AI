@@ -71,7 +71,10 @@ const QuickAccessMenu = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         quickAccess: "Quick Access",
         aiTutor: "AI Tutor",
