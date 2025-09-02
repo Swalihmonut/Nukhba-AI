@@ -3,28 +3,31 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Card, CardContent } from "@/components/ui/card";
-import AITutor, { AIProvider } from "@/components/AITutor";
+import AITutor from "@/components/AITutor";
 
-// Error Boundary Component
+// Define a simple AI context
+const AIContext = React.createContext({});
+export const AIProvider = ({ children }: { children: React.ReactNode }) => (
+  <AIContext.Provider value={{}}>{children}</AIContext.Provider>
+);
+
+// A simple error boundary
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback: React.ReactNode },
   { hasError: boolean }
 > {
   state = { hasError: false };
-
   static getDerivedStateFromError() {
     return { hasError: true };
   }
-
   render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
+    if (this.state.hasError) return this.props.fallback;
     return this.props.children;
   }
 }
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
   const [language, setLanguage] = useState<"english" | "arabic" | "hindi">(
     "english",
   );
