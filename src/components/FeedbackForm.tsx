@@ -47,7 +47,10 @@ const FeedbackForm = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         feedback: "Feedback",
         rateThi: "Rate this",
@@ -298,7 +301,8 @@ const FeedbackForm = ({
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium">
-                    {getLocalizedText("rateThi")} {getLocalizedText(context)}
+                    {getLocalizedText("rateThi")}{" "}
+                    {getLocalizedText(context)}
                   </Label>
                   <div className="flex gap-1 mt-2">
                     {[1, 2, 3, 4, 5].map((star) => (
