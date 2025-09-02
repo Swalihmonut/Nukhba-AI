@@ -33,7 +33,10 @@ const OfflineManager = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         offlineMode: "Offline Mode",
         onlineMode: "Online Mode",
@@ -290,7 +293,7 @@ const OfflineManager = ({
         {offlineData?.lastSync && (
           <p className="text-xs text-muted-foreground">
             {getLocalizedText("lastSync")}{" "}
-            {offlineData.lastSync.toLocaleString()}
+            {new Date(offlineData.lastSync).toLocaleString()}
           </p>
         )}
       </CardContent>
