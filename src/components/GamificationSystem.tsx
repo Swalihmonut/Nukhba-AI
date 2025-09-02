@@ -59,7 +59,10 @@ const GamificationSystem = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         gamification: "Gamification",
         achievements: "Achievements",
