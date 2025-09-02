@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from "react";
 import AITutor from "@/components/AITutor";
 
 // Define a simple AI context
 const AIContext = React.createContext({});
-export const AIProvider = ({ children }: { children: React.ReactNode }) => (
+const AIProvider = ({ children }: { children: React.ReactNode }) => (
   <AIContext.Provider value={{}}>{children}</AIContext.Provider>
 );
 
@@ -27,7 +25,6 @@ class ErrorBoundary extends React.Component<
 }
 
 export default function Home() {
-  const { theme, setTheme } = useTheme();
   const [language, setLanguage] = useState<"english" | "arabic" | "hindi">(
     "english",
   );
