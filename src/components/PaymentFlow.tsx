@@ -48,7 +48,10 @@ const PaymentFlow = ({
   const isRTL = language === "arabic";
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         choosePlan: "Choose Your Plan",
         paymentMethod: "Payment Method",
