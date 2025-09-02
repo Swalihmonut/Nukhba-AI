@@ -109,50 +109,6 @@ export default function Home() {
             </ErrorBoundary>
           </CardContent>
         </Card>
-
-        {/*
-          // You can uncomment these sections later, one by one, to debug them.
-          <Tabs
-            defaultValue="dashboard"
-            value={activeTab}
-            onValueChange={(value) =>
-              setActiveTab(
-                value as
-                  | "dashboard"
-                  | "tutor"
-                  | "quiz"
-                  | "flashcards"
-                  | "analytics",
-              )
-            }
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="dashboard">
-                {getLocalizedText("dashboard")}
-              </TabsTrigger>
-              <TabsTrigger value="tutor">
-                {getLocalizedText("aiTutor")}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard" className="space-y-6">
-              <StudyDashboard language={language} />
-              <QuickAccessMenu
-                language={language}
-                onTutorClick={() => setActiveTab("tutor")}
-              />
-            </TabsContent>
-
-            <TabsContent value="tutor">
-              <Card>
-                <CardContent className="p-0">
-                  <AITutor language={language} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        */}
       </div>
 
       {/* Footer */}
