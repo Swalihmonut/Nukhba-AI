@@ -14,6 +14,7 @@ import {
   Target,
   Trophy,
 } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface StudyGoal {
   id: string;
@@ -123,7 +124,10 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
   };
 
   const getLocalizedText = (key: string) => {
-    const texts = {
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<string, string>
+    > = {
       english: {
         hello: `Hello, ${userName}`,
         dailyPlan: "Here's your daily study plan",
@@ -181,7 +185,9 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
 
   return (
     <div
-      className={`w-full bg-background p-4 md:p-6 slide-up ${isRTL ? "rtl" : "ltr"}`}
+      className={`w-full bg-background p-4 md:p-6 slide-up ${
+        isRTL ? "rtl" : "ltr"
+      }`}
     >
       <div className="flex flex-col space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -224,12 +230,18 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
               return (
                 <Card
                   key={goal.id}
-                  className={`transition-all duration-300 hover:shadow-md ${isCompleted ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800" : ""}`}
+                  className={`transition-all duration-300 hover:shadow-md ${
+                    isCompleted
+                      ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                      : ""
+                  }`}
                 >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-center mb-2">
                       <h3
-                        className={`font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}
+                        className={`font-medium ${
+                          isCompleted ? "line-through text-muted-foreground" : ""
+                        }`}
                       >
                         {goal.title}
                       </h3>
@@ -286,8 +298,8 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                               language === "arabic"
                                 ? "ar-SA"
                                 : language === "hindi"
-                                  ? "hi-IN"
-                                  : "en-US",
+                                ? "hi-IN"
+                                : "en-US",
                             )}
                           </p>
                         </div>
@@ -296,8 +308,8 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                             exam.daysLeft <= 7
                               ? "bg-red-500 hover:bg-red-600"
                               : exam.daysLeft <= 30
-                                ? "bg-yellow-500 hover:bg-yellow-600"
-                                : "bg-green-500 hover:bg-green-600"
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-green-500 hover:bg-green-600"
                           }`}
                         >
                           <Clock className="h-3 w-3" />
@@ -350,8 +362,8 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                           language === "arabic"
                             ? "ar-SA"
                             : language === "hindi"
-                              ? "hi-IN"
-                              : "en-US",
+                            ? "hi-IN"
+                            : "en-US",
                         )}
                       </p>
                     </div>
