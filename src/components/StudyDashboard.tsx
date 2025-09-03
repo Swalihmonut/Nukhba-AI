@@ -276,6 +276,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                 <CardContent>
                   <Calendar
                     mode="single"
+                    required
                     selected={date}
                     onSelect={setDate}
                     className="rounded-md border"
