@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTheme } from "next-themes";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MoonIcon, SunIcon, Sparkles } from "lucide-react";
@@ -10,7 +9,7 @@ import StudyDashboard from "@/components/StudyDashboard";
 import QuickAccessMenu from "@/components/QuickAccessMenu";
 import AITutor from "@/components/AITutor";
 
-// A simple error boundary
+// A simple error boundary to catch any unexpected errors in child components
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback: React.ReactNode },
   { hasError: boolean }
