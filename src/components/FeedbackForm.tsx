@@ -46,8 +46,37 @@ const FeedbackForm = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "feedback"
+      | "rateThi"
+      | "quiz"
+      | "tutor"
+      | "flashcard"
+      | "general"
+      | "howWasIt"
+      | "selectRating"
+      | "category"
+      | "selectCategory"
+      | "bug"
+      | "feature"
+      | "content"
+      | "ui"
+      | "performance"
+      | "other"
+      | "message"
+      | "messagePlaceholder"
+      | "submit"
+      | "submitting"
+      | "thankYou"
+      | "giveFeedback"
+      | "quickFeedback"
+      | "helpful"
+      | "notHelpful";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         feedback: "Feedback",
         rateThi: "Rate this",
@@ -130,7 +159,7 @@ const FeedbackForm = ({
         notHelpful: "सहायक नहीं",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   const categories = [

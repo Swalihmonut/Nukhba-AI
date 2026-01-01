@@ -58,8 +58,32 @@ const GamificationSystem = ({
   const [showCelebration, setShowCelebration] = useState(false);
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "gamification"
+      | "achievements"
+      | "leaderboard"
+      | "referrals"
+      | "level"
+      | "points"
+      | "streak"
+      | "nextLevel"
+      | "unlocked"
+      | "locked"
+      | "progress"
+      | "shareCode"
+      | "earnPoints"
+      | "topLearners"
+      | "yourRank"
+      | "celebrate"
+      | "common"
+      | "rare"
+      | "epic"
+      | "legendary";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         gamification: "Gamification",
         achievements: "Achievements",
@@ -127,7 +151,7 @@ const GamificationSystem = ({
         legendary: "पौराणिक",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   const achievements: Achievement[] = [

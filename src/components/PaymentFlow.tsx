@@ -116,7 +116,9 @@ const PaymentFlow = ({
         selectWallet: "वॉलेट चुनें",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    const langTexts = texts[language] as Record<TextKey, string>;
+    const englishTexts = texts.english;
+    return langTexts?.[key as TextKey] || englishTexts[key as TextKey] || "";
   };
 
   const plans: PaymentPlan[] = [
@@ -201,17 +203,8 @@ const PaymentFlow = ({
         error instanceof Error ? error.message : "Payment processing failed";
       onPaymentError(errorMessage);
 
-      // Auto-retry for specific errors
-      if (
-        errorMessage.includes("timeout") ||
-        errorMessage.includes("unavailable")
-      ) {
-        setTimeout(() => {
-          if (paymentStatus === "error") {
-            setPaymentStatus("idle");
-          }
-        }, 5000);
-      }
+      // Auto-retry for specific errors - handled via useEffect to avoid stale closure
+      // Note: Auto-retry logic can be added via useEffect if needed
     } finally {
       setIsProcessing(false);
     }

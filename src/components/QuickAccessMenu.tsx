@@ -70,8 +70,27 @@ const QuickAccessMenu = ({
   const { theme } = useTheme();
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "quickAccess"
+      | "aiTutor"
+      | "aiTutorDesc"
+      | "quizzes"
+      | "quizzesDesc"
+      | "flashcards"
+      | "flashcardsDesc"
+      | "materials"
+      | "materialsDesc"
+      | "tests"
+      | "testsDesc"
+      | "analytics"
+      | "analyticsDesc"
+      | "settings"
+      | "settingsDesc";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         quickAccess: "Quick Access",
         aiTutor: "AI Tutor",
@@ -124,7 +143,7 @@ const QuickAccessMenu = ({
         settingsDesc: "अपने सीखने के अनुभव को अनुकूलित करें",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   const menuItems = [

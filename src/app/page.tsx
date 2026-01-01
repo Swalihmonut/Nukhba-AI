@@ -25,10 +25,14 @@ class ErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback: React.ReactNode },
   { hasError: boolean }
 > {
-  state = { hasError: false };
+  state: { hasError: boolean } = { hasError: false };
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(): { hasError: boolean } {
     return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   render() {
@@ -67,18 +71,42 @@ export default function Home() {
   };
 
   const toggleNotifications = () => {
-    setNotificationsEnabled((prev) => !prev);
+    setNotificationsEnabled((prev: boolean) => !prev);
     // In a real app, this would trigger enabling/disabling push notifications
   };
 
   const handleGoalComplete = (goalId: string) => {
-    setCompletedGoals((prev) => prev + 1);
+    setCompletedGoals((prev: number) => prev + 1);
     setShowCelebration(true);
     setTimeout(() => setShowCelebration(false), 3000);
   };
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "appName"
+      | "tagline"
+      | "dashboard"
+      | "aiTutor"
+      | "quizzes"
+      | "flashcards"
+      | "analytics"
+      | "switchLanguage"
+      | "toggleTheme"
+      | "toggleNotifications"
+      | "notificationsOn"
+      | "notificationsOff"
+      | "lightMode"
+      | "darkMode"
+      | "copyright"
+      | "welcomeBack"
+      | "readyToLearn"
+      | "goalCompleted"
+      | "queryLimitReached"
+      | "errorFallback";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         appName: "Nukhba AI",
         tagline: "The Future of Competitive Exam Prep",
@@ -150,7 +178,7 @@ export default function Home() {
         errorFallback: "कुछ गलत हो गया। कृपया बाद में पुनः प्रयास करें।",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   // Load user preferences with validation
@@ -230,7 +258,7 @@ export default function Home() {
           <Tabs
             defaultValue="dashboard"
             value={activeTab}
-            onValueChange={(value) =>
+            onValueChange={(value: string) =>
               setActiveTab(
                 value as
                   | "dashboard"

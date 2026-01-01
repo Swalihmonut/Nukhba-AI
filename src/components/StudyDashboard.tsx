@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Calendar as CalendarIcon,
@@ -122,8 +123,27 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
     }
   };
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "hello"
+      | "dailyPlan"
+      | "studyStreak"
+      | "dailyGoals"
+      | "upcomingExams"
+      | "achievements"
+      | "progress"
+      | "days"
+      | "calendar"
+      | "studyStats"
+      | "goalCompletion"
+      | "studyHours"
+      | "consecutiveDays"
+      | "complete"
+      | "completed";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         hello: `Hello, ${userName}`,
         dailyPlan: "Here's your daily study plan",
@@ -176,7 +196,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
         completed: "पूर्ण",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   return (

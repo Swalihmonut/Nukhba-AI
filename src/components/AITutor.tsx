@@ -29,7 +29,7 @@ interface Message {
   content: string;
   sender: "user" | "ai";
   timestamp: Date;
-  language: "english" | "arabic";
+  language: "english" | "arabic" | "hindi";
 }
 
 interface AITutorProps {
@@ -84,8 +84,24 @@ const AITutor = ({
   const [isPremium] = useState(false);
   const isRTL = currentLanguage === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "aiTutor"
+      | "text"
+      | "voice"
+      | "listen"
+      | "typePlaceholder"
+      | "processing"
+      | "aiResponse"
+      | "voiceResponse"
+      | "dailyLimit"
+      | "upgradePrompt"
+      | "queriesLeft"
+      | "rateLimited";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         aiTutor: "AI Tutor",
         text: "Text",
@@ -137,7 +153,7 @@ const AITutor = ({
           "आपने अपनी दैनिक सीमा पूरी कर ली है। कृपया प्रीमियम में अपग्रेड करें या कल फिर कोशिश करें।",
       },
     };
-    return texts[currentLanguage]?.[key] || texts.english[key];
+    return texts[currentLanguage]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   const handleLanguageChange = (value: "english" | "arabic" | "hindi") => {
@@ -386,3 +402,10 @@ const AITutor = ({
 };
 
 export default AITutor;
+
+// AIProvider Context for managing AI state across components
+export const AIProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return <>{children}</>;
+};

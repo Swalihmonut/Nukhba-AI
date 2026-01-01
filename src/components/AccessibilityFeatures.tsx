@@ -52,8 +52,29 @@ const AccessibilityFeatures = ({
   const [isVisible, setIsVisible] = useState(false);
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "accessibility"
+      | "highContrast"
+      | "largeText"
+      | "screenReader"
+      | "keyboardNav"
+      | "reducedMotion"
+      | "colorBlind"
+      | "fontSize"
+      | "voiceSpeed"
+      | "wcagCompliant"
+      | "testAccessibility"
+      | "announceChanges"
+      | "skipToContent"
+      | "keyboardShortcuts"
+      | "altText"
+      | "focusIndicators"
+      | "colorContrast";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         accessibility: "Accessibility",
         highContrast: "High Contrast",
@@ -112,7 +133,7 @@ const AccessibilityFeatures = ({
         colorContrast: "4.5:1 रंग कंट्रास्ट अनुपात",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
 
   // Apply accessibility settings to document
@@ -158,7 +179,7 @@ const AccessibilityFeatures = ({
       // Alt + A to toggle accessibility panel
       if (e.altKey && e.key === "a") {
         e.preventDefault();
-        setIsVisible(!isVisible);
+        setIsVisible((prev) => !prev);
       }
 
       // Alt + S to skip to main content
@@ -167,14 +188,20 @@ const AccessibilityFeatures = ({
         const main = document.querySelector("main");
         if (main) {
           main.focus();
-          announceToScreenReader(getLocalizedText("skipToContent"));
+          const skipText =
+            language === "arabic"
+              ? "تخطي إلى المحتوى"
+              : language === "hindi"
+                ? "सामग्री पर जाएं"
+                : "Skip to Content";
+          announceToScreenReader(skipText);
         }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [settings.keyboardNavigation, isVisible, getLocalizedText]);
+  }, [settings.keyboardNavigation, language]);
 
   const announceToScreenReader = (message: string) => {
     if (!settings.screenReader) return;

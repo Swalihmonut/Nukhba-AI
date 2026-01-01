@@ -32,8 +32,16 @@ const VoiceInteraction = ({
 }: VoiceInteractionProps) => {
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string) => {
-    const texts = {
+  const getLocalizedText = (key: string): string => {
+    type TextKey =
+      | "recording"
+      | "tapToSpeak"
+      | "autoPlay"
+      | "language";
+    const texts: Record<
+      "english" | "arabic" | "hindi",
+      Record<TextKey, string>
+    > = {
       english: {
         recording: "Recording...",
         tapToSpeak: "Tap to speak",
@@ -53,7 +61,7 @@ const VoiceInteraction = ({
         language: "भाषा",
       },
     };
-    return texts[language]?.[key] || texts.english[key];
+    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -275,21 +283,3 @@ const VoiceInteraction = ({
 };
 
 export default VoiceInteraction;
-
-async function onRecordingComplete(recording: Blob) {
-  try {
-    const response = await uploadRecording(recording);
-    console.log("Recording uploaded successfully:", response);
-  } catch (error) {
-    console.error("Failed to upload recording:", error);
-  }
-}
-
-// Example data fetching and processing
-fetchData()
-  .then((data) => {
-    processData(data);
-  })
-  .catch((error) => {
-    console.error("Failed to fetch data:", error);
-  });
