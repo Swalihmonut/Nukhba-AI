@@ -52,28 +52,10 @@ const AccessibilityFeatures = ({
   const [isVisible, setIsVisible] = useState(false);
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string): string => {
-    type TextKey =
-      | "accessibility"
-      | "highContrast"
-      | "largeText"
-      | "screenReader"
-      | "keyboardNav"
-      | "reducedMotion"
-      | "colorBlind"
-      | "fontSize"
-      | "voiceSpeed"
-      | "wcagCompliant"
-      | "testAccessibility"
-      | "announceChanges"
-      | "skipToContent"
-      | "keyboardShortcuts"
-      | "altText"
-      | "focusIndicators"
-      | "colorContrast";
+  const getLocalizedText = (key: string) => {
     const texts: Record<
       "english" | "arabic" | "hindi",
-      Record<TextKey, string>
+      Record<string, string>
     > = {
       english: {
         accessibility: "Accessibility",
@@ -133,7 +115,7 @@ const AccessibilityFeatures = ({
         colorContrast: "4.5:1 रंग कंट्रास्ट अनुपात",
       },
     };
-    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
+    return texts[language]?.[key] || texts.english[key];
   };
 
   // Apply accessibility settings to document
@@ -179,7 +161,7 @@ const AccessibilityFeatures = ({
       // Alt + A to toggle accessibility panel
       if (e.altKey && e.key === "a") {
         e.preventDefault();
-        setIsVisible((prev) => !prev);
+        setIsVisible(!isVisible);
       }
 
       // Alt + S to skip to main content
@@ -188,20 +170,14 @@ const AccessibilityFeatures = ({
         const main = document.querySelector("main");
         if (main) {
           main.focus();
-          const skipText =
-            language === "arabic"
-              ? "تخطي إلى المحتوى"
-              : language === "hindi"
-                ? "सामग्री पर जाएं"
-                : "Skip to Content";
-          announceToScreenReader(skipText);
+          announceToScreenReader(getLocalizedText("skipToContent"));
         }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [settings.keyboardNavigation, language]);
+  }, [settings.keyboardNavigation, isVisible, getLocalizedText]);
 
   const announceToScreenReader = (message: string) => {
     if (!settings.screenReader) return;
@@ -221,7 +197,7 @@ const AccessibilityFeatures = ({
     value: AccessibilitySettings[K],
   ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
-    announceToScreenReader(`${key} ${value ? "enabled" : "disabled"}`);
+    announceToScreenReader(`${String(key)} ${value ? "enabled" : "disabled"}`);
   };
 
   const testAccessibility = () => {
@@ -287,7 +263,9 @@ const AccessibilityFeatures = ({
       {/* Accessibility Panel */}
       {isVisible && (
         <Card
-          className={`fixed top-4 right-4 z-40 w-80 max-h-[80vh] overflow-y-auto ${isRTL ? "rtl" : "ltr"}`}
+          className={`fixed top-4 right-4 z-40 w-80 max-h-[80vh] overflow-y-auto ${
+            isRTL ? "rtl" : "ltr"
+          }`}
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -319,7 +297,10 @@ const AccessibilityFeatures = ({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="large-text" className="flex items-center gap-2">
+                <Label
+                  htmlFor="large-text"
+                  className="flex items-center gap-2"
+                >
                   <Type className="h-4 w-4" />
                   {getLocalizedText("largeText")}
                 </Label>
@@ -338,7 +319,9 @@ const AccessibilityFeatures = ({
                 </Label>
                 <Slider
                   value={[settings.fontSize]}
-                  onValueChange={([value]) => updateSetting("fontSize", value)}
+                  onValueChange={([value]) =>
+                    updateSetting("fontSize", value)
+                  }
                   min={12}
                   max={24}
                   step={1}

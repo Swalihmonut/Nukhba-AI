@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -32,21 +32,10 @@ const OfflineManager = ({
   const [syncStatus, setSyncStatus] = useState("idle");
   const isRTL = language === "arabic";
 
-  const getLocalizedText = (key: string): string => {
-    type TextKey =
-      | "offlineMode"
-      | "onlineMode"
-      | "syncPending"
-      | "syncNow"
-      | "syncing"
-      | "lastSync"
-      | "offlineReady"
-      | "noConnection"
-      | "syncComplete"
-      | "syncFailed";
+  const getLocalizedText = (key: string) => {
     const texts: Record<
       "english" | "arabic" | "hindi",
-      Record<TextKey, string>
+      Record<string, string>
     > = {
       english: {
         offlineMode: "Offline Mode",
@@ -85,8 +74,34 @@ const OfflineManager = ({
         syncFailed: "सिंक असफल। स्वचालित रूप से पुनः प्रयास करेगा।",
       },
     };
-    return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
+    return texts[language]?.[key] || texts.english[key];
   };
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      // Auto-sync when coming back online
+      if (pendingSync > 0) {
+        handleSync();
+      }
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Check initial status
+    setIsOnline(navigator.onLine);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [pendingSync]);
 
   // Load offline data from localStorage
   useEffect(() => {
@@ -110,7 +125,7 @@ const OfflineManager = ({
     loadOfflineData();
   }, []);
 
-  const handleSync = useCallback(async () => {
+  const handleSync = async () => {
     if (!isOnline || isSyncing) return;
 
     setIsSyncing(true);
@@ -203,53 +218,17 @@ const OfflineManager = ({
       }
     } catch (error) {
       console.error("Sync failed after all retries:", error);
-      // Note: Auto-retry is handled by the useEffect hook
+
+      // Schedule automatic retry
+      setTimeout(() => {
+        if (isOnline && !isSyncing) {
+          handleSync();
+        }
+      }, 30000); // Retry after 30 seconds
     } finally {
       setIsSyncing(false);
     }
-  }, [isOnline, isSyncing, onSyncComplete]);
-
-  // Monitor online/offline status
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
-    // Check initial status
-    setIsOnline(navigator.onLine);
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
-  }, []);
-
-  // Auto-sync when coming back online with pending sync
-  useEffect(() => {
-    if (isOnline && pendingSync > 0 && !isSyncing) {
-      handleSync();
-    }
-  }, [isOnline, pendingSync, isSyncing, handleSync]);
-
-  // Auto-retry on failure
-  useEffect(() => {
-    if (syncStatus === "failed" && isOnline && !isSyncing) {
-      const retryTimeout = setTimeout(() => {
-        handleSync();
-      }, 30000); // Retry after 30 seconds
-
-      return () => {
-        clearTimeout(retryTimeout);
-      };
-    }
-  }, [syncStatus, isOnline, isSyncing, handleSync]);
+  };
 
   const addPendingSync = (count: number = 1) => {
     const newPending = pendingSync + count;
@@ -314,7 +293,7 @@ const OfflineManager = ({
         {offlineData?.lastSync && (
           <p className="text-xs text-muted-foreground">
             {getLocalizedText("lastSync")}{" "}
-            {offlineData.lastSync.toLocaleString()}
+            {new Date(offlineData.lastSync).toLocaleString()}
           </p>
         )}
       </CardContent>
