@@ -116,9 +116,9 @@ const PaymentFlow = ({
         selectWallet: "वॉलेट चुनें",
       },
     };
-    const langTexts = texts[language] as Record<TextKey, string>;
+    const langTexts = texts[language];
     const englishTexts = texts.english;
-    return langTexts?.[key as TextKey] || englishTexts[key as TextKey] || "";
+    return (langTexts?.[key as keyof typeof langTexts] as string) || (englishTexts[key as keyof typeof englishTexts] as string) || "";
   };
 
   const plans: PaymentPlan[] = [

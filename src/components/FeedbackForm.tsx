@@ -307,6 +307,8 @@ const FeedbackForm = ({
                 size="sm"
                 onClick={() => setIsOpen(false)}
                 className="h-6 w-6 p-0"
+                aria-label="Close feedback form"
+                title="Close feedback form"
               >
                 ×
               </Button>
@@ -340,6 +342,8 @@ const FeedbackForm = ({
                             ? "text-yellow-500"
                             : "text-gray-300 hover:text-yellow-400"
                         }`}
+                        aria-label={`Rate ${star} out of 5 stars`}
+                        title={`Rate ${star} out of 5 stars`}
                       >
                         <Star className="h-6 w-6 fill-current" />
                       </button>
@@ -356,6 +360,8 @@ const FeedbackForm = ({
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full mt-1 p-2 border rounded-md bg-background"
+                    aria-label={getLocalizedText("category")}
+                    title={getLocalizedText("category")}
                   >
                     <option value="">
                       {getLocalizedText("selectCategory")}

@@ -5,10 +5,7 @@ import { DayPicker } from "react-day-picker";
 import { buttonVariants } from "../../components/ui/button";
 import { cn } from "@/lib/utils";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
-  date: Date; // Change from `number` to `Date`
-  onDateChange: (date: Date) => void;
-};
+export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
   className,

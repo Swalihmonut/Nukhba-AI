@@ -246,7 +246,7 @@ const VoiceInteraction = ({
             <Languages className="h-4 w-4 text-muted-foreground" />
             <Select
               value={language}
-              onValueChange={(value) => onLanguageChange(value)}
+              onValueChange={(value) => onLanguageChange(value as "english" | "arabic" | "hindi")}
             >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Language" />
