@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,11 +15,13 @@ import {
   Trophy,
   Target,
   Bell,
+  Home as HomeIcon,
 } from "lucide-react";
 import StudyDashboard from "@/components/StudyDashboard";
 import QuickAccessMenu from "@/components/QuickAccessMenu";
 import AITutor from "@/components/AITutor";
 import { AIProvider } from "@/components/AITutor";
+import QuizModule from "@/components/QuizModule";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -102,7 +105,8 @@ export default function Home() {
       | "readyToLearn"
       | "goalCompleted"
       | "queryLimitReached"
-      | "errorFallback";
+      | "errorFallback"
+      | "backToHub";
     const texts: Record<
       "english" | "arabic" | "hindi",
       Record<TextKey, string>
@@ -129,6 +133,7 @@ export default function Home() {
         queryLimitReached:
           "AI query limit reached. Upgrade to premium for unlimited access.",
         errorFallback: "Something went wrong. Please try again later.",
+        backToHub: "Back to Hub",
       },
       arabic: {
         appName: "نخبة الذكي",
@@ -152,6 +157,7 @@ export default function Home() {
         queryLimitReached:
           "تم الوصول إلى حد الاستفسارات. قم بالترقية للوصول غير المحدود.",
         errorFallback: "حدث خطأ. يرجى المحاولة لاحقاً.",
+        backToHub: "العودة إلى المركز",
       },
       hindi: {
         appName: "नुख्बा AI",
@@ -176,6 +182,7 @@ export default function Home() {
         queryLimitReached:
           "AI क्वेरी सीमा पहुंच गई। असीमित पहुंच के लिए प्रीमियम में अपग्रेड करें।",
         errorFallback: "कुछ गलत हो गया। कृपया बाद में पुनः प्रयास करें।",
+        backToHub: "हब पर वापस जाएं",
       },
     };
     return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
@@ -233,7 +240,7 @@ export default function Home() {
   return (
     <AIProvider>
       <main
-        className={`flex min-h-screen flex-col items-center justify-between p-4 md:p-8 bg-background transition-all duration-300`}
+        className={`flex min-h-screen flex-col items-center justify-between p-2 sm:p-4 md:p-6 lg:p-8 bg-background transition-all duration-300 max-w-full overflow-x-hidden`}
         dir={isRTL ? "rtl" : "ltr"}
       >
         {/* Celebration overlay */}
@@ -248,10 +255,26 @@ export default function Home() {
           </div>
         )}
 
-        <div className="w-full max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-4">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h1>{getLocalizedText("appName")}</h1>
+          <div className="flex justify-between items-center mb-4 sm:mb-6 gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <Link
+                href="https://peregrine-io.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-accent transition-colors text-sm sm:text-base font-medium"
+                aria-label={getLocalizedText("backToHub")}
+                title={getLocalizedText("backToHub")}
+              >
+                <HomeIcon className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
+                <span className="hidden sm:inline">{getLocalizedText("backToHub")}</span>
+              </Link>
+              <div className="h-6 w-px bg-border" />
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+                {getLocalizedText("appName")}
+              </h1>
+            </div>
           </div>
 
           {/* Main content tabs */}
@@ -270,12 +293,15 @@ export default function Home() {
             }
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6 text-xs sm:text-sm">
               <TabsTrigger value="dashboard">
                 {getLocalizedText("dashboard")}
               </TabsTrigger>
               <TabsTrigger value="tutor">
                 {getLocalizedText("aiTutor")}
+              </TabsTrigger>
+              <TabsTrigger value="quiz">
+                {getLocalizedText("quizzes")}
               </TabsTrigger>
             </TabsList>
 
@@ -339,6 +365,24 @@ export default function Home() {
                   </CardContent>
                 </Card>
               )}
+            </TabsContent>
+
+            <TabsContent value="quiz" className="space-y-6">
+              <ErrorBoundary
+                fallback={
+                  <p className="text-red-500">
+                    {getLocalizedText("errorFallback")}
+                  </p>
+                }
+              >
+                <QuizModule
+                  language={language}
+                  onComplete={(score, total) => {
+                    console.log(`Quiz completed: ${score}/${total}`);
+                    // Could show a toast or update user progress here
+                  }}
+                />
+              </ErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>
