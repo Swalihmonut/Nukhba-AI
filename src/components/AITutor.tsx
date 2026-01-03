@@ -23,6 +23,8 @@ import {
 } from "./ui/select";
 import VoiceInteraction from "./VoiceInteraction";
 import FeedbackForm from "./FeedbackForm";
+import { toast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 interface Message {
   id: string;
@@ -37,6 +39,18 @@ interface AITutorProps {
   initialInteractionMode?: "text" | "voice";
   messages?: Message[];
   onLanguageChange?: (language: "english" | "arabic" | "hindi") => void;
+}
+
+const DAILY_FREE_MESSAGE_LIMIT = 10;
+const DAILY_USAGE_STORAGE_KEY = "nukhba-ai-daily-usage";
+
+function getTodayISODate() {
+  // YYYY-MM-DD (local time, not UTC)
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 // Helper function to get the welcome message
@@ -80,6 +94,57 @@ const AITutor = ({
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const isRTL = currentLanguage === "arabic";
+
+  const tryConsumeDailyMessage = () => {
+    try {
+      const today = getTodayISODate();
+      const raw = localStorage.getItem(DAILY_USAGE_STORAGE_KEY);
+      const parsed =
+        raw && raw.trim().length > 0
+          ? (JSON.parse(raw) as { date?: string; count?: number })
+          : null;
+
+      const storedDate = parsed?.date;
+      const storedCount =
+        typeof parsed?.count === "number" && Number.isFinite(parsed.count)
+          ? parsed.count
+          : 0;
+
+      const nextCount = storedDate === today ? storedCount : 0;
+
+      if (nextCount >= DAILY_FREE_MESSAGE_LIMIT) {
+        toast({
+          title: "Daily free limit reached",
+          description:
+            "You've reached the daily free limit! Join Peregrine Academy for unlimited access.",
+          action: (
+            <ToastAction
+              altText="Join Peregrine Academy"
+              onClick={() => {
+                window.open(
+                  "https://peregrine-io.com",
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              }}
+            >
+              Join
+            </ToastAction>
+          ),
+        });
+        return false;
+      }
+
+      localStorage.setItem(
+        DAILY_USAGE_STORAGE_KEY,
+        JSON.stringify({ date: today, count: nextCount + 1 }),
+      );
+      return true;
+    } catch {
+      // If localStorage is blocked/unavailable, fail open to avoid breaking core UX.
+      return true;
+    }
+  };
 
   const getLocalizedText = (key: string) => {
     const texts: Record<
@@ -132,6 +197,7 @@ const AITutor = ({
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
+    if (!tryConsumeDailyMessage()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -161,6 +227,7 @@ const AITutor = ({
 
   const handleVoiceMessage = (transcription: string) => {
     if (!transcription.trim()) return;
+    if (!tryConsumeDailyMessage()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),

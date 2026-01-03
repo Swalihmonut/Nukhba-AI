@@ -1,4 +1,5 @@
 import { TempoInit } from "@/components/tempo-init";
+import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
           <TempoInit />
         </ThemeProvider>
       </body>
