@@ -6,7 +6,7 @@ import { Card } from "./ui/card";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
-import { Mic, MicOff, Play, Square, Volume2, Languages } from "lucide-react";
+import { Mic, Play, Square, Volume2, Languages } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -31,6 +31,7 @@ const VoiceInteraction = ({
   language = "english",
 }: VoiceInteractionProps) => {
   const isRTL = language === "arabic";
+  const isActivelyListening = isRecording || isListening;
 
   const getLocalizedText = (key: string): string => {
     type TextKey =
@@ -75,7 +76,7 @@ const VoiceInteraction = ({
 
   // Simulate voice visualization when recording
   useEffect(() => {
-    if (isRecording) {
+    if (isActivelyListening) {
       const updateVisualizer = () => {
         const newData = visualizerData.map(
           () => Math.floor(Math.random() * 40) + 5,
@@ -94,7 +95,7 @@ const VoiceInteraction = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isRecording, visualizerData]);
+  }, [isActivelyListening, visualizerData]);
 
   // Handle audio playback
   useEffect(() => {
@@ -178,7 +179,7 @@ const VoiceInteraction = ({
               <div
                 key={index}
                 className={`w-1.5 rounded-t-sm transition-all duration-200 ${
-                  isRecording
+                  isActivelyListening
                     ? "bg-gradient-to-t from-primary to-primary/60 voice-bar"
                     : "bg-muted"
                 }`}
@@ -192,20 +193,58 @@ const VoiceInteraction = ({
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-2">
+        {/* Mobile: centered FAB-style mic */}
+        <div className="flex flex-col items-center gap-2 sm:hidden">
+          <div className="relative">
+            {isActivelyListening && (
+              <>
+                <span className="absolute inset-0 rounded-full bg-primary/25 animate-ping" />
+                <span className="absolute -inset-2 rounded-full border border-primary/30 animate-pulse" />
+              </>
+            )}
             <Button
               variant={isRecording ? "destructive" : "default"}
               size="icon"
               onClick={handleRecordToggle}
-              className="rounded-full h-12 w-12"
+              className="relative rounded-full h-16 w-16 shadow-lg"
+              aria-label={isRecording ? getLocalizedText("recording") : getLocalizedText("tapToSpeak")}
             >
               {isRecording ? (
-                <Square className="h-5 w-5" />
+                <Square className="h-6 w-6" />
               ) : (
-                <Mic className="h-5 w-5" />
+                <Mic className="h-6 w-6" />
               )}
             </Button>
+          </div>
+          <div className="text-sm font-medium text-center">
+            {isRecording ? getLocalizedText("recording") : getLocalizedText("tapToSpeak")}
+          </div>
+        </div>
+
+        {/* Desktop/tablet: inline controls */}
+        <div className="hidden sm:flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              {isActivelyListening && (
+                <>
+                  <span className="absolute inset-0 rounded-full bg-primary/25 animate-ping" />
+                  <span className="absolute -inset-1 rounded-full border border-primary/30 animate-pulse" />
+                </>
+              )}
+              <Button
+                variant={isRecording ? "destructive" : "default"}
+                size="icon"
+                onClick={handleRecordToggle}
+                className="relative rounded-full h-12 w-12"
+                aria-label={isRecording ? getLocalizedText("recording") : getLocalizedText("tapToSpeak")}
+              >
+                {isRecording ? (
+                  <Square className="h-5 w-5" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </Button>
+            </div>
             <div className="text-sm font-medium">
               {isRecording
                 ? getLocalizedText("recording")

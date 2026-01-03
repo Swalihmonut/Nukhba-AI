@@ -59,7 +59,6 @@ export default function Home() {
   const [completedGoals, setCompletedGoals] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [aiQueryLimitReached, setAiQueryLimitReached] = useState(false); // Rate limiting state
   const isRTL = language === "arabic";
 
   const cycleLanguage = () => {
@@ -223,20 +222,6 @@ export default function Home() {
     }
   }, [theme]);
 
-  // Mock rate limiting check (in a real app, this would be an API call)
-  useEffect(() => {
-    const checkQueryLimit = () => {
-      const queryCount = parseInt(
-        localStorage.getItem("ai-query-count") || "0",
-        10,
-      );
-      if (queryCount >= 10) {
-        setAiQueryLimitReached(true);
-      }
-    };
-    checkQueryLimit();
-  }, []);
-
   return (
     <AIProvider>
       <main
@@ -333,38 +318,19 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="tutor">
-              {aiQueryLimitReached ? (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <p className="text-red-500">
-                      {getLocalizedText("queryLimitReached")}
-                    </p>
-                    <Button
-                      onClick={() => {
-                        // In a real app, this would redirect to a subscription page
-                        console.log("Redirect to premium subscription");
-                      }}
-                      className="mt-4"
-                    >
-                      Upgrade to Premium
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card>
-                  <CardContent className="p-0">
-                    <ErrorBoundary
-                      fallback={
-                        <p className="text-red-500">
-                          {getLocalizedText("errorFallback")}
-                        </p>
-                      }
-                    >
-                      <AITutor language={language} />
-                    </ErrorBoundary>
-                  </CardContent>
-                </Card>
-              )}
+              <Card>
+                <CardContent className="p-0">
+                  <ErrorBoundary
+                    fallback={
+                      <p className="text-red-500">
+                        {getLocalizedText("errorFallback")}
+                      </p>
+                    }
+                  >
+                    <AITutor language={language} />
+                  </ErrorBoundary>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="quiz" className="space-y-6">
