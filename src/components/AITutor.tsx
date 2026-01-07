@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -31,6 +31,23 @@ interface Message {
   timestamp: Date;
   language: "english" | "arabic" | "hindi";
 }
+
+// AI Context for sharing state across components
+interface AIContextType {
+  // Add context values here as needed in the future
+}
+
+const AIContext = createContext<AIContextType | undefined>(undefined);
+
+// AIProvider component - wraps children and provides AI context
+export const AIProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  // Add any shared state or logic here as needed
+  const value: AIContextType = {};
+
+  return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
+};
 
 interface AITutorProps {
   language?: "english" | "arabic" | "hindi";
