@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     });
 
     // System prompt for Nukhba AI tutor
-    const systemPrompt = "You are Nukhba, a helpful Arabic language tutor. Correct grammar and keep responses concise.";
+    const systemPrompt = "You are Nukhba, a helpful Arabic tutor. Keep answers short and correct grammar.";
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
