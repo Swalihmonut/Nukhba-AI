@@ -44,7 +44,7 @@ interface StudyDashboardProps {
   upcomingExams?: Exam[];
   achievements?: Achievement[];
   studyStreak?: number;
-  language?: "english" | "arabic";
+  language?: 'english' | 'arabic';
   onGoalComplete?: (goalId: string) => void;
   onExamClick?: (examId: string) => void;
 }

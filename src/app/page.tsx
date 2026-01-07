@@ -48,9 +48,7 @@ class ErrorBoundary extends React.Component<
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const [language, setLanguage] = useState<"english" | "arabic">(
-    "english",
-  );
+  const [language, setLanguage] = useState<'english' | 'arabic'>('english');
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "tutor" | "quiz" | "flashcards" | "analytics"
   >("dashboard");
@@ -63,9 +61,9 @@ export default function Home() {
   const isRTL = language === "arabic";
 
   const cycleLanguage = () => {
-    const languages: ("english" | "arabic")[] = [
-      "english",
-      "arabic",
+    const languages: ('english' | 'arabic')[] = [
+      'english',
+      'arabic',
     ];
     const currentIndex = languages.indexOf(language);
     const nextIndex = (currentIndex + 1) % languages.length;
@@ -169,9 +167,9 @@ export default function Home() {
     const savedUserName = localStorage.getItem("nukhba-username");
 
     // Validate language
-    const validLanguages = ["english", "arabic"];
+    const validLanguages = ['english', 'arabic'];
     if (savedLanguage && validLanguages.includes(savedLanguage)) {
-      setLanguage(savedLanguage as "english" | "arabic");
+      setLanguage(savedLanguage as 'english' | 'arabic');
     }
 
     // Validate theme
