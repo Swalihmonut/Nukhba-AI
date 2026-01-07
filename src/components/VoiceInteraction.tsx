@@ -185,12 +185,16 @@ const VoiceInteraction = ({
       console.error("Error calling /api/chat:", error);
       const errorMsg = error instanceof Error 
         ? error.message 
-        : getLocalizedText("networkError");
+        : language === "arabic" 
+          ? "خطأ في الشبكة. يرجى التحقق من اتصالك."
+          : language === "hindi"
+          ? "नेटवर्क त्रुटि। कृपया अपने कनेक्शन की जांच करें।"
+          : "Network error. Please check your connection.";
       setError(errorMsg);
     } finally {
       setIsProcessing(false);
     }
-  }, [autoPlay, onAIResponse, speakText, getLocalizedText]);
+  }, [autoPlay, onAIResponse, speakText, language]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -341,95 +345,6 @@ const VoiceInteraction = ({
     }
   }, [aiResponseAudio, autoPlay]);
 
-  // Function to send transcript to API and get AI response
-  const handleSendToAPI = async (transcriptText: string) => {
-    if (!transcriptText.trim()) return;
-
-    setIsProcessing(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: transcriptText }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const aiResponseText = data.response || "";
-
-      if (aiResponseText) {
-        setAiResponse(aiResponseText);
-        onAIResponse(aiResponseText);
-
-        // Speak the AI response using speechSynthesis in Arabic voice
-        if (autoPlay && typeof window !== "undefined" && "speechSynthesis" in window) {
-          speakText(aiResponseText);
-        }
-      }
-    } catch (error) {
-      console.error("Error calling /api/chat:", error);
-      const errorMsg = error instanceof Error 
-        ? error.message 
-        : getLocalizedText("networkError");
-      setError(errorMsg);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  // Function to speak text using speechSynthesis with Arabic voice
-  const speakText = (text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      return;
-    }
-
-    try {
-      // Stop any ongoing speech
-      window.speechSynthesis.cancel();
-
-      synthesisRef.current = window.speechSynthesis;
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      // Set language based on current language (prioritize Arabic)
-      if (language === "arabic") {
-        utterance.lang = "ar-SA";
-        // Try to find an Arabic voice
-        const voices = window.speechSynthesis.getVoices();
-        const arabicVoice = voices.find(
-          (voice) => voice.lang.startsWith("ar") || voice.name.toLowerCase().includes("arabic")
-        );
-        if (arabicVoice) {
-          utterance.voice = arabicVoice;
-        }
-      } else if (language === "hindi") {
-        utterance.lang = "hi-IN";
-        const voices = window.speechSynthesis.getVoices();
-        const hindiVoice = voices.find(
-          (voice) => voice.lang.startsWith("hi") || voice.name.toLowerCase().includes("hindi")
-        );
-        if (hindiVoice) {
-          utterance.voice = hindiVoice;
-        }
-      } else {
-        utterance.lang = "en-US";
-      }
-
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = volume[0] / 100;
-
-      synthesisRef.current.speak(utterance);
-    } catch (error) {
-      console.error("Error speaking text:", error);
-    }
-  };
 
   // Load voices when component mounts
   useEffect(() => {
