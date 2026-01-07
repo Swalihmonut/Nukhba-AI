@@ -130,7 +130,7 @@ const AITutor = ({
     onLanguageChange(value);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputText.trim()) return;
 
     const userMessage: Message = {
@@ -142,13 +142,30 @@ const AITutor = ({
     };
 
     setChatMessages((prev) => [...prev, userMessage]);
+    const messageText = inputText;
     setInputText("");
     setIsProcessing(true);
 
-    setTimeout(() => {
+    try {
+      // Send message to /api/chat endpoint
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: messageText }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponseText = data.response || getLocalizedText("aiResponse");
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: getLocalizedText("aiResponse"),
+        content: aiResponseText,
         sender: "ai",
         timestamp: new Date(),
         language: currentLanguage,
@@ -156,7 +173,69 @@ const AITutor = ({
 
       setChatMessages((prevMessages) => [...prevMessages, aiResponse]);
       setIsProcessing(false);
-    }, 1500);
+
+      // Speak the AI response using speechSynthesis
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        speakText(aiResponseText);
+      }
+    } catch (error) {
+      console.error("Error calling /api/chat:", error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: currentLanguage === "arabic"
+          ? "عذراً، حدث خطأ. يرجى المحاولة مرة أخرى."
+          : currentLanguage === "hindi"
+          ? "क्षमा करें, एक त्रुटि हुई। कृपया पुनः प्रयास करें।"
+          : "Sorry, an error occurred. Please try again.",
+        sender: "ai",
+        timestamp: new Date(),
+        language: currentLanguage,
+      };
+      setChatMessages((prevMessages) => [...prevMessages, errorResponse]);
+      setIsProcessing(false);
+    }
+  };
+
+  // Function to speak text using speechSynthesis with Arabic voice
+  const speakText = (text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return;
+    }
+
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Set language based on current language
+    if (currentLanguage === "arabic") {
+      utterance.lang = "ar-SA";
+      // Try to find an Arabic voice
+      const voices = window.speechSynthesis.getVoices();
+      const arabicVoice = voices.find(
+        (voice) => voice.lang.startsWith("ar") || voice.name.toLowerCase().includes("arabic")
+      );
+      if (arabicVoice) {
+        utterance.voice = arabicVoice;
+      }
+    } else if (currentLanguage === "hindi") {
+      utterance.lang = "hi-IN";
+      const voices = window.speechSynthesis.getVoices();
+      const hindiVoice = voices.find(
+        (voice) => voice.lang.startsWith("hi") || voice.name.toLowerCase().includes("hindi")
+      );
+      if (hindiVoice) {
+        utterance.voice = hindiVoice;
+      }
+    } else {
+      utterance.lang = "en-US";
+    }
+
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    window.speechSynthesis.speak(utterance);
   };
 
   const handleVoiceMessage = async (transcription: string) => {
@@ -221,48 +300,6 @@ const AITutor = ({
       setChatMessages((prevMessages) => [...prevMessages, errorResponse]);
       setIsProcessing(false);
     }
-  };
-
-  // Function to speak text using speechSynthesis with Arabic voice
-  const speakText = (text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      return;
-    }
-
-    // Stop any ongoing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Set language based on current language
-    if (currentLanguage === "arabic") {
-      utterance.lang = "ar-SA";
-      // Try to find an Arabic voice
-      const voices = window.speechSynthesis.getVoices();
-      const arabicVoice = voices.find(
-        (voice) => voice.lang.startsWith("ar") || voice.name.toLowerCase().includes("arabic")
-      );
-      if (arabicVoice) {
-        utterance.voice = arabicVoice;
-      }
-    } else if (currentLanguage === "hindi") {
-      utterance.lang = "hi-IN";
-      const voices = window.speechSynthesis.getVoices();
-      const hindiVoice = voices.find(
-        (voice) => voice.lang.startsWith("hi") || voice.name.toLowerCase().includes("hindi")
-      );
-      if (hindiVoice) {
-        utterance.voice = hindiVoice;
-      }
-    } else {
-      utterance.lang = "en-US";
-    }
-
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -373,6 +410,11 @@ const AITutor = ({
                         variant="ghost"
                         size="sm"
                         className="mt-1 hover:bg-primary/10"
+                        onClick={() => {
+                          if (typeof window !== "undefined" && "speechSynthesis" in window) {
+                            speakText(message.content);
+                          }
+                        }}
                       >
                         <Volume2 className="h-4 w-4 mr-1" />
                         {getLocalizedText("listen")}
@@ -432,13 +474,7 @@ const AITutor = ({
             <TabsContent value="voice" className="mt-0">
               <VoiceInteraction
                 language={currentLanguage}
-                onRecordingComplete={(blob) => {
-                  setTimeout(() => {
-                    handleVoiceMessage(
-                      "This is a simulated voice transcription for testing purposes.",
-                    );
-                  }, 1000);
-                }}
+                onTranscript={handleVoiceMessage}
                 onLanguageChange={handleLanguageChange}
                 isListening={isProcessing}
               />
