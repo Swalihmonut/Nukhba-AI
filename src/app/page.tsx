@@ -48,7 +48,7 @@ class ErrorBoundary extends React.Component<
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const [language, setLanguage] = useState<"english" | "arabic" | "hindi">(
+  const [language, setLanguage] = useState<"english" | "arabic">(
     "english",
   );
   const [activeTab, setActiveTab] = useState<
@@ -63,10 +63,9 @@ export default function Home() {
   const isRTL = language === "arabic";
 
   const cycleLanguage = () => {
-    const languages: ("english" | "arabic" | "hindi")[] = [
+    const languages: ("english" | "arabic")[] = [
       "english",
       "arabic",
-      "hindi",
     ];
     const currentIndex = languages.indexOf(language);
     const nextIndex = (currentIndex + 1) % languages.length;
@@ -108,7 +107,7 @@ export default function Home() {
       | "errorFallback"
       | "backToHub";
     const texts: Record<
-      "english" | "arabic" | "hindi",
+      "english" | "arabic",
       Record<TextKey, string>
     > = {
       english: {
@@ -159,31 +158,6 @@ export default function Home() {
         errorFallback: "حدث خطأ. يرجى المحاولة لاحقاً.",
         backToHub: "العودة إلى المركز",
       },
-      hindi: {
-        appName: "नुख्बा AI",
-        tagline: "प्रतियोगी परीक्षा तैयारी का भविष्य",
-        dashboard: "डैशबोर्ड",
-        aiTutor: "AI शिक्षक",
-        quizzes: "प्रश्नोत्तरी",
-        flashcards: "फ्लैशकार्ड",
-        analytics: "विश्लेषण",
-        switchLanguage: "भाषा बदलें",
-        toggleTheme: "थीम टॉगल करें",
-        toggleNotifications: "सूचनाएं टॉगल करें",
-        notificationsOn: "सूचनाएं चालू",
-        notificationsOff: "सूचनाएं बंद",
-        lightMode: "लाइट मोड पर स्विच करें",
-        darkMode: "डार्क मोड पर स्विच करें",
-        copyright: "© 2025 नुख्बा AI. सभी अधिकार सुरक्षित।",
-        welcomeBack: "वापसी पर स्वागत!",
-        readyToLearn:
-          "क्या आप अपनी सीखने की यात्रा जारी रखने के लिए तैयार हैं?",
-        goalCompleted: "लक्ष्य पूरा हुआ! शानदार काम!",
-        queryLimitReached:
-          "AI क्वेरी सीमा पहुंच गई। असीमित पहुंच के लिए प्रीमियम में अपग्रेड करें।",
-        errorFallback: "कुछ गलत हो गया। कृपया बाद में पुनः प्रयास करें।",
-        backToHub: "हब पर वापस जाएं",
-      },
     };
     return texts[language]?.[key as TextKey] || texts.english[key as TextKey];
   };
@@ -195,9 +169,9 @@ export default function Home() {
     const savedUserName = localStorage.getItem("nukhba-username");
 
     // Validate language
-    const validLanguages = ["english", "arabic", "hindi"];
+    const validLanguages = ["english", "arabic"];
     if (savedLanguage && validLanguages.includes(savedLanguage)) {
-      setLanguage(savedLanguage as "english" | "arabic" | "hindi");
+      setLanguage(savedLanguage as "english" | "arabic");
     }
 
     // Validate theme
