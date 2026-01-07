@@ -44,7 +44,7 @@ interface StudyDashboardProps {
   upcomingExams?: Exam[];
   achievements?: Achievement[];
   studyStreak?: number;
-  language?: "english" | "arabic";
+  language?: "english" | "arabic" | "hindi";
   onGoalComplete?: (goalId: string) => void;
   onExamClick?: (examId: string) => void;
 }
@@ -118,7 +118,7 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
   };
 
   const getLocalizedText = (key: string) => {
-    const texts: Record<"english" | "arabic", Record<string, string>> = {
+    const texts: Record<"english" | "arabic" | "hindi", Record<string, string>> = {
       english: {
         hello: `Hello, ${userName}`,
         dailyPlan: "Here's your daily study plan",
@@ -152,6 +152,23 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
         consecutiveDays: "أيام متتالية",
         complete: "إكمال",
         completed: "مكتمل",
+      },
+      hindi: {
+        hello: `नमस्ते, ${userName}`,
+        dailyPlan: "यहाँ आपकी दैनिक अध्ययन योजना है",
+        studyStreak: `अध्ययन स्ट्रीक: ${studyStreak} दिन`,
+        dailyGoals: "दैनिक लक्ष्य",
+        upcomingExams: "आगामी परीक्षाएं",
+        achievements: "उपलब्धियां",
+        progress: "प्रगति",
+        days: "दिन",
+        calendar: "कैलेंडर",
+        studyStats: "अध्ययन आंकड़े",
+        goalCompletion: "लक्ष्य पूर्ति दर",
+        studyHours: "इस सप्ताह अध्ययन के घंटे",
+        consecutiveDays: "लगातार दिन",
+        complete: "पूर्ण करें",
+        completed: "पूर्ण",
       },
     };
     return texts[language]?.[key] || texts.english[key];
@@ -255,7 +272,11 @@ const StudyDashboard: React.FC<StudyDashboardProps> = ({
                           <h3 className="font-medium">{exam.title}</h3>
                           <p className="text-sm text-muted-foreground">
                             {new Date(exam.date).toLocaleDateString(
-                              language === "arabic" ? "ar-SA" : "en-US",
+                              language === "arabic" 
+                                ? "ar-SA" 
+                                : language === "hindi" 
+                                ? "hi-IN" 
+                                : "en-US",
                             )}
                           </p>
                         </div>
